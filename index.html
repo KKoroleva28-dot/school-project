@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Влияние СМИ на подростков</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+
+        select, input, button {
+            margin-top: 10px;
+            padding: 8px;
+            width: 100%;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #miniResult, #result {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<div <button id="themeToggle" class="theme-btn">🌙</button>
+
+
+</div>
+<h1>Влияние СМИ на подростков</h1>
+
+<!-- Теория -->
+<div class="card">
+    <p>
+        Средства массовой информации (СМИ) и социальные сети играют важную роль
+        в жизни подростков. Они влияют на мышление, поведение, настроение и
+        самооценку. СМИ могут быть источником знаний, но также вызывать зависимость,
+        стресс и искажённое восприятие реальности.
+    </p>
+</div>
+
+<!-- Мини-опрос -->
+<div class="card">
+    <h2>Быстрый мини-опрос</h2>
+
+    <p>Как часто ты пользуешься социальными сетями?</p>
+
+    <select id="quickAnswer">
+        <option value="0">Выбери вариант</option>
+        <option value="1">Редко (меньше 1 часа в день)</option>
+        <option value="2">Умеренно (1–3 часа)</option>
+        <option value="3">Часто (более 3 часов)</option>
+    </select>
+
+    <button onclick="showMiniResult()">Показать результат</button>
+
+    <div id="miniResult"></div>
+</div>
+
+<!-- Основной опрос -->
+<div class="card">
+    <h2>Основной опрос</h2>
+
+    <form id="surveyForm">
+        <label>
+            Сколько часов в день вы проводите в СМИ?
+            <input type="number" id="mediaTime" min="0" required>
+        </label>
+
+        <label>Как СМИ влияют на ваше настроение?</label>
+        <label><input type="radio" name="mood" value="Положительно" required> Положительно</label>
+        <label><input type="radio" name="mood" value="Нейтрально"> Нейтрально</label>
+        <label><input type="radio" name="mood" value="Негативно"> Негативно</label>
+
+        <label>
+            Насколько вы доверяете СМИ? (1–10)
+            <input type="range" id="trust" min="1" max="10" value="5">
+        </label>
+
+        <button type="submit">Отправить анкету</button>
+    </form>
+
+    <div id="result"></div>
+</div>
+<div class="card">
+    <h2>Статистика опроса</h2>
+    <div id="stats"></div>
+</div>
+
+<footer>
+    Школьный проект · Обществознание / Королёва 10Б
+</footer>
+
+<script>
+"use strict";
+
+// ----- Мини-опрос -----
+function showMiniResult() {
+    const value = document.getElementById("quickAnswer").value;
+    const result = document.getElementById("miniResult");
+
+    if (value == 0) {
+        result.textContent = "Пожалуйста, выбери вариант ответа.";
+    } else if (value == 1) {
+        result.textContent = "Низкое влияние СМИ. Ты хорошо контролируешь своё время 👍";
+    } else if (value == 2) {
+        result.textContent = "Среднее влияние СМИ. Важно соблюдать баланс ⚖️";
+    } else {
+        result.textContent = "Высокое влияние СМИ. Стоит задуматься о цифровом детоксе 📱";
+    }
+}
+
+// ----- Основной опрос -----
+const form = document.getElementById("surveyForm");
+const resultBlock = document.getElementById("result");
+
+form.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const mediaTime = Number(document.getElementById("mediaTime").value);
+    const mood = document.querySelector("input[name='mood']:checked").value;
+    const trust = Number(document.getElementById("trust").value);
+
+    let influence;
+
+    if (mediaTime >= 5 && trust >= 7) {
+        influence = "СМИ оказывают сильное влияние на подростка.";
+    } else if (mediaTime >= 3) {
+        influence = "СМИ оказывают умеренное влияние.";
+    } else {
+        influence = "Влияние СМИ минимальное.";
+    }
+
+    resultBlock.innerHTML = `
+        <h3>Результаты опроса</h3>
+        <p><strong>Время в СМИ:</strong> ${mediaTime} часов в день</p>
+        <p><strong>Влияние на настроение:</strong> ${mood}</p>
+        <p><strong>Уровень доверия:</strong> ${trust} из 10</p>
+        <p><strong>Вывод:</strong> ${influence}</p>
+    `;
+
+    saveData(mediaTime, mood, trust);
+});
+
+// ----- Сохранение данных -----
+function saveData(time, mood, trust) {
+    const data = {
+        mediaTime: time,
+        moodEffect: mood,
+        trustLevel: trust,
+        date: new Date().toLocaleDateString()
+    };
+
+    let savedData = JSON.parse(localStorage.getItem("mediaSurvey")) || [];
+    savedData.push(data);
+    localStorage.setItem("mediaSurvey", JSON.stringify(savedData));
+}
+</script>
+<script>let userId = localStorage.getItem("userId");
+
+if (!userId) {
+    userId = "user_" + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem("userId", userId);
+}
+</script>
+<script>
+"use strict";
+let userId = localStorage.getItem("userId");
+
+if (!userId) {
+    userId = "user_" + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem("userId", userId);
+}
+</script>
+<script>function showStatistics() {
+    const data = JSON.parse(localStorage.getItem("mediaSurvey")) || [];
+    const statsBlock = document.getElementById("stats");
+
+    if (data.length === 0) {
+        statsBlock.textContent = "Данных пока нет.";
+        return;
+    }
+
+    const uniqueUsers = new Set(data.map(item => item.userId)).size;
+
+    let totalTime = 0;
+    data.forEach(item => totalTime += item.mediaTime);
+
+    const avgTime = (totalTime / data.length).toFixed(1);
+
+    statsBlock.innerHTML = `
+        <p>Всего ответов: ${data.length}</p>
+        <p>Уникальных участников: ${uniqueUsers}</p>
+        <p>Среднее время в СМИ: ${avgTime} ч/день</p>
+    `;
+}
+
+// Показываем статистику при загрузке страницы
+showStatistics();
+</script>
+<style>body.dark {
+    background-color: #1e1e1e;
+    color: #f0f0f0;
+}
+
+body.dark .card {
+    background-color: #2b2b2b;
+}
+
+body.dark button {
+    background-color: #555;
+}
+
+body.dark button:hover {
+    background-color: #777;
+}
+</style>
+<script>// ----- Переключение темы -----
+const themeButton = document.getElementById("themeToggle");
+
+// Загружаем сохранённую тему
+if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+}
+
+themeButton.addEventListener("click", function () {
+    document.body.classList.toggle("dark");
+
+    // Сохраняем выбор пользователя
+    if (document.body.classList.contains("dark")) {
+        localStorage.setItem("theme", "dark");
+    } else {
+        localStorage.setItem("theme", "light");
+    }
+});
+</script>
+<script>.theme-btn {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+    font-size: 18px;
+
+    padding: 0;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</script>
+<script>const themeButton = document.getElementById("themeToggle");
+
+// Загружаем сохранённую тему
+if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+    themeButton.textContent = "☀️";
+}
+
+themeButton.addEventListener("click", function () {
+    document.body.classList.toggle("dark");
+
+    if (document.body.classList.contains("dark")) {
+        themeButton.textContent = "☀️";
+        localStorage.setItem("theme", "dark");
+    } else {
+        themeButton.textContent = "🌙";
+        localStorage.setItem("theme", "light");
+    }
+});
+</script>
+
+</body>
+</html>
