@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Влияние СМИ на подростков</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial;background:linear-gradient(135deg,#6a11cb,#2575fc);min-height:100vh;display:flex;justify-content:center;align-items:center;transition:0.3s;}
+.dark{background:#121212;}
+.container{background:white;padding:40px;border-radius:15px;width:90%;max-width:600px;box-shadow:0 20px 40px rgba(0,0,0,0.2);}
+.dark .container{background:#1e1e1e;color:white;}
+h1{text-align:center;margin-bottom:15px;}
+.counter{text-align:center;margin-bottom:20px;font-weight:bold;}
+.buttons{display:flex;gap:10px;margin-bottom:20px;}
+label{display:block;margin-top:18px;font-weight:bold;}
+select,input{width:100%;padding:12px;margin-top:6px;border-radius:8px;border:1px solid #ccc;}
+button{flex:1;margin-top:15px;padding:14px;border:none;border-radius:8px;background:#2575fc;color:white;font-size:16px;cursor:pointer;transition:0.2s;}
+button:hover{transform:scale(1.1) rotate(-1deg);box-shadow:0 5px 15px rgba(0,0,0,0.3);}
+.theme{position:fixed;top:20px;right:20px;padding:8px 14px;background:black;color:white;border-radius:20px;cursor:pointer;}
+.dark .theme{background:white;color:black;}
+.progress{height:8px;background:#eee;border-radius:10px;margin-bottom:25px;overflow:hidden;}
+.bar{height:100%;width:0%;background:#2575fc;transition:0.4s;}
+.success{margin-top:20px;padding:15px;background:#d4edda;border-radius:8px;display:none;text-align:center;}
+.stats{margin-top:20px;padding:15px;background:#f1f1f1;border-radius:10px;display:none;}
+.dark .stats{background:#2a2a2a;}
+.about{margin-top:20px;background:#f7f7f7;padding:15px;border-radius:10px;font-size:14px;line-height:1.5;}
+.dark .about{background:#2a2a2a;}
+#researchResult{font-size:14px;line-height:1.6;margin-top:20px;padding:15px;background:#fff3cd;border-radius:10px;display:none;}
+#tip{margin-top:20px;background:#e0f7fa;padding:10px 15px;border-radius:8px;font-size:13px;text-align:center;}
+.dark #tip{background:#004d40;color:#b2dfdb;}
+.confetti-piece{position:absolute;width:8px;height:8px;opacity:0.8;pointer-events:none;z-index:9999;animation:confetti-fall 2s linear forwards;}
+@keyframes confetti-fall{0%{transform:translateY(0) rotate(0deg);opacity:1;}100%{transform:translateY(300px) rotate(360deg);opacity:0;}}
+</style>
+</head>
+<body>
+
+<div class="theme" onclick="toggleTheme()">Тема</div>
+
+<div class="container">
+
+<h1>Влияние СМИ на подростков</h1>
+<div class="about">
+<h3>Почему эта тема важна?</h3>
+<p>Средства массовой информации играют важную роль в жизни подростков. Социальные сети, новостные сайты и видеоплатформы формируют мнение, поведение и мировоззрение молодых людей.</p>
+<p>Подростки ежедневно сталкиваются с огромным количеством информации. Она может оказывать как положительное влияние — помогать получать новые знания и развивать интересы, так и отрицательное — вызывать стресс, зависимость от социальных сетей или формировать нереалистичные ожидания от жизни.</p>
+<p>Цель этого опроса — узнать, сколько времени подростки проводят в социальных сетях и как они оценивают влияние СМИ на своё настроение, поведение и получение информации.</p>
+</div>
+
+<div class="counter">Прошли опрос: <span id="count">0</span></div>
+
+<div class="buttons">
+<button onclick="showStats()">Статистика</button>
+<button onclick="downloadResults()">Скачать</button>
+<button onclick="clearResults()">Очистить</button>
+</div>
+
+<div class="progress"><div class="bar" id="bar"></div></div>
+
+<form id="survey">
+<label>Ваше имя (необязательно)</label>
+<input type="text" name="name">
+<label>Сколько времени вы проводите в соцсетях?</label>
+<select name="time" required>
+<option value="">Выберите</option>
+<option>Менее 1 часа</option>
+<option>1-3 часа</option>
+<option>3-5 часов</option>
+<option>Более 5 часов</option>
+</select>
+<label>Какие соцсети вы используете чаще всего?</label>
+<input type="text" name="social">
+<label>Влияют ли СМИ на ваше настроение?</label>
+<select name="mood">
+<option>Да</option>
+<option>Иногда</option>
+<option>Нет</option>
+</select>
+<label>Получаете ли вы новости из соцсетей?</label>
+<select name="news">
+<option>Да</option>
+<option>Иногда</option>
+<option>Нет</option>
+</select>
+<label>Считаете ли вы что СМИ сильно влияют на подростков?</label>
+<select name="impact">
+<option>Да</option>
+<option>Нет</option>
+<option>Не знаю</option>
+</select>
+<button type="submit">Отправить ответ</button>
+</form>
+
+<div id="analysis" style="margin-top:15px;font-weight:bold;"></div>
+<div class="success" id="success">Спасибо! Ваш ответ сохранён.</div>
+<div class="stats" id="stats"></div>
+<div id="researchResult"></div>
+<canvas id="chart" style="margin-top:20px;display:none;"></canvas>
+<div id="tip"></div>
+
+</div>
+
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbz3RdsPEUZklxDLvHYFKIzFksl4ON4i3GTRHDyKkEfrzxBNPsnGVijFDid9MIdVevt5iw/exec";
+const form=document.getElementById("survey");
+const bar=document.getElementById("bar");
+const counter=document.getElementById("count");
+let fields=form.querySelectorAll("select,input");
+updateCounter();
+fields.forEach(f=>f.addEventListener("change",updateProgress));
+const tips=[
+"Проводите не более 4 часов в соцсетях в день, чтобы сохранять продуктивность.",
+"СМИ могут формировать ваше мнение: проверяйте факты!",
+"Чтение новостей с разных источников уменьшает влияние пропаганды.",
+"Отдых от соцсетей помогает снизить стресс.",
+"Создавайте позитивный контент сами – делитесь знаниями!"
+];
+document.getElementById("tip").textContent=tips[Math.floor(Math.random()*tips.length)];
+
+function updateProgress(){
+let filled=0;
+fields.forEach(f=>{if(f.value!=="") filled++});
+let percent=(filled/fields.length)*100;
+bar.style.width=percent+"%";
+}
+
+form.addEventListener("submit",function(e){
+e.preventDefault();
+let data={
+name:this.name.value||"Аноним",
+time:this.time.value,
+social:this.social.value,
+mood:this.mood.value,
+news:this.news.value,
+impact:this.impact.value,
+date:new Date().toLocaleDateString()
+};
+let results=JSON.parse(localStorage.getItem("surveyResults"))||[];
+results.push(data);
+localStorage.setItem("surveyResults",JSON.stringify(results));
+sendData(data);
+document.getElementById("success").style.display="block";
+let analysis=document.getElementById("analysis");
+if(data.time==="Более 5 часов"){analysis.innerHTML="⚠️ Высокое влияние СМИ.";}
+else if(data.time==="3-5 часов"){analysis.innerHTML="📊 Умеренное влияние СМИ.";}
+else{analysis.innerHTML="✅ Низкое влияние СМИ.";}
+updateCounter();
+generateResearchConclusion(results);
+createConfetti();
+form.reset(); bar.style.width="0%";
+});
+
+function sendData(data){
+fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(data)});
+}
+
+function updateCounter(){
+let results=JSON.parse(localStorage.getItem("surveyResults"))||[];
+counter.textContent=results.length;
+}
+
+function showStats(){
+let results=JSON.parse(localStorage.getItem("surveyResults"))||[];
+if(results.length===0){alert("Пока нет результатов"); return;}
+let statsDiv=document.getElementById("stats");
+statsDiv.style.display="block";
+let total=results.length;
+let more5=results.filter(r=>r.time==="Более 5 часов").length;
+let moodYes=results.filter(r=>r.mood==="Да").length;
+let percent=Math.round((more5/total)*100);
+statsDiv.innerHTML=`<h3>Статистика</h3><br>
+Всего ответов: <b>${total}</b><br><br>
+Более 5 часов: <b>${more5}</b><br><br>
+СМИ влияет на настроение: <b>${moodYes}</b><br><br>
+Сильное влияние СМИ: <b>${percent}%</b>`;
+createChart(results);
+}
+
+function createChart(results){
+let chartCanvas=document.getElementById("chart");
+chartCanvas.style.display="block";
+let times={"Менее 1 часа":0,"1-3 часа":0,"3-5 часов":0,"Более 5 часов":0};
+results.forEach(r=>{times[r.time]++});
+new Chart(chartCanvas,{
+type:'bar',
+data:{labels:Object.keys(times),datasets:[{label:'Количество людей',data:Object.values(times),backgroundColor:'#2575fc'}]},
+options:{responsive:true}
+});
+}
+
+function downloadResults(){
+let results=JSON.parse(localStorage.getItem("surveyResults"))||[];
+if(results.length===0){alert("Нет данных"); return;}
+let text=JSON.stringify(results,null,2);
+let blob=new Blob([text],{type:"application/json"});
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="survey_results.json";
+a.click();
+}
+
+function clearResults(){
+localStorage.removeItem("surveyResults");
+updateCounter();
+alert("Данные очищены");
+}
+
+function toggleTheme(){
+document.body.classList.toggle("dark");
+if(document.body.classList.contains("dark")){localStorage.setItem("theme","dark");}
+else{localStorage.setItem("theme","light");}
+}
+if(localStorage.getItem("theme")=="dark"){document.body.classList.add("dark");}
+
+function generateResearchConclusion(results){
+let resultDiv=document.getElementById("researchResult");
+let total=results.length;
+let high=results.filter(r=>r.time==="Более 5 часов").length;
+let medium=results.filter(r=>r.time==="3-5 часов").length;
+let low=results.filter(r=>r.time==="1-3 часа").length;
+let highPercent=Math.round((high/total)*100);
+let mediumPercent=Math.round((medium/total)*100);
+let text="<h3>Вывод исследования</h3><br>";
+if(highPercent>40){text+="Исследование показывает, что значительная часть подростков проводит более 5 часов в социальных сетях. Это может свидетельствовать о высоком уровне влияния СМИ на их повседневную жизнь и настроение.";}
+else if(mediumPercent>40){text+="Результаты показывают, что большинство подростков проводят в социальных сетях несколько часов в день. СМИ оказывают заметное, но умеренное влияние на подростков.";}
+else{text+="Согласно результатам опроса, большинство подростков проводят относительно небольшое количество времени в социальных сетях, что говорит о сравнительно низком уровне влияния СМИ.";}
+text+="<br><br>Всего участников исследования: <b>"+total+"</b>.";
+resultDiv.innerHTML=text; resultDiv.style.display="block";
+}
+
+// ----------------------
+// Confetti
+function createConfetti(){
+for(let i=0;i<30;i++){
+const confetti=document.createElement("div");
+confetti.classList.add("confetti-piece");
+confetti.style.left=Math.random()*window.innerWidth+"px";
+confetti.style.backgroundColor=`hsl(${Math.random()*360},100%,50%)`;
+document.body.appendChild(confetti);
+setTimeout(()=>confetti.remove(),2000);
+}
+}
+</script>
+
+</body>
+</html>
